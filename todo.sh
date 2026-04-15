@@ -35,19 +35,19 @@ show_menu() {
     clear
     echo -e "${CYAN}${BOLD}"
     echo "╔══════════════════════════════════════╗"
-    echo "║        ✅  TODO LIST MANAGER         ║"
+    echo "║          TODO LIST MANAGER         ║"
     echo "╚══════════════════════════════════════╝"
     echo -e "${RESET}"
-    echo -e "${BOLD}  1.${RESET} 📋 Afficher toutes les tâches"
-    echo -e "${BOLD}  2.${RESET} ➕ Ajouter une tâche"
-    echo -e "${BOLD}  3.${RESET} ✔️  Marquer une tâche comme terminée"
-    echo -e "${BOLD}  4.${RESET} ❌ Supprimer une tâche"
-    echo -e "${BOLD}  5.${RESET} 🔍 Rechercher une tâche"
-    echo -e "${BOLD}  6.${RESET} 📁 Gérer les sous-tâches"
-    echo -e "${BOLD}  7.${RESET} 📜 Voir l'historique"
-    echo -e "${BOLD}  8.${RESET} 🗑️  Vider les tâches terminées"
-    echo -e "${BOLD}  9.${RESET} 📊 Statistiques"
-    echo -e "${BOLD}  0.${RESET} 🚪 Quitter"
+    echo -e "${BOLD}  1.${RESET}  Afficher toutes les tâches"
+    echo -e "${BOLD}  2.${RESET}  Ajouter une tâche"
+    echo -e "${BOLD}  3.${RESET}   Marquer une tâche comme terminée"
+    echo -e "${BOLD}  4.${RESET}  Supprimer une tâche"
+    echo -e "${BOLD}  5.${RESET}  Rechercher une tâche"
+    echo -e "${BOLD}  6.${RESET}  Gérer les sous-tâches"
+    echo -e "${BOLD}  7.${RESET}  Voir l'historique"
+    echo -e "${BOLD}  8.${RESET}   Vider les tâches terminées"
+    echo -e "${BOLD}  9.${RESET}  Statistiques"
+    echo -e "${BOLD}  0.${RESET}  Quitter"
     echo ""
     echo -ne "${YELLOW}Votre choix : ${RESET}"
 }
@@ -86,7 +86,7 @@ add_task() {
     date=$(date '+%Y-%m-%d')
     echo "TODO|$task|$priority|$date" >> "$TASKS_FILE"
     log_action "AJOUT : $task (Priorité: $priority)"
-    echo -e "${GREEN}  ✅ Tâche '$task' ajoutée avec succès !${RESET}"
+    echo -e "${GREEN}   Tâche '$task' ajoutée avec succès !${RESET}"
 }
 
 # Marquer une tâche comme terminée
@@ -108,7 +108,7 @@ complete_task() {
     task_name=$(sed -n "${num}p" "$TASKS_FILE" | cut -d'|' -f2)
     sed -i "${num}s/^TODO/DONE/" "$TASKS_FILE"
     log_action "TERMINÉ : $task_name"
-    echo -e "${GREEN}  ✔️  Tâche '$task_name' marquée comme terminée !${RESET}"
+    echo -e "${GREEN}    Tâche '$task_name' marquée comme terminée !${RESET}"
 }
 
 # Supprimer une tâche
@@ -133,7 +133,7 @@ delete_task() {
     if [ "$confirm" = "o" ] || [ "$confirm" = "O" ]; then
         sed -i "${num}d" "$TASKS_FILE"
         log_action "SUPPRESSION : $task_name"
-        echo -e "${GREEN}  🗑️  Tâche '$task_name' supprimée.${RESET}"
+        echo -e "${GREEN}    Tâche '$task_name' supprimée.${RESET}"
     else
         echo -e "${YELLOW}  Suppression annulée.${RESET}"
     fi
@@ -230,7 +230,7 @@ clear_done() {
     if [ "$confirm" = "o" ] || [ "$confirm" = "O" ]; then
         sed -i '/^DONE/d' "$TASKS_FILE"
         log_action "NETTOYAGE : $count tâche(s) terminée(s) supprimée(s)"
-        echo -e "${GREEN}  🗑️  $count tâche(s) supprimée(s).${RESET}"
+        echo -e "${GREEN}    $count tâche(s) supprimée(s).${RESET}"
     fi
 }
 
@@ -253,7 +253,7 @@ show_stats() {
     local bar=""
     local filled=$((pct / 5))
     for ((i=0; i<20; i++)); do
-        [ $i -lt $filled ] && bar+="█" || bar+="░"
+        [ $i -lt $filled ] && bar+="" || bar+="░"
     done
     echo -e "  ${GREEN}[$bar]${RESET} $pct%"
 
@@ -282,7 +282,7 @@ main() {
             8) clear_done ;;
             9) show_stats ;;
             0)
-                echo -e "\n${GREEN}  Au revoir ! 👋${RESET}\n"
+                echo -e "\n${GREEN}  Au revoir ! ${RESET}\n"
                 log_action "FIN DE SESSION"
                 exit 0
                 ;;
