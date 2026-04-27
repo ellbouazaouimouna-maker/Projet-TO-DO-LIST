@@ -3,8 +3,7 @@
 # Définition de l'environnement graphique pour que cron puisse afficher des notifications
 export DISPLAY=:0
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
-
-FICHIER_DONNEES="/chemin/absolu/vers/ton/dossier/taches.txt" # À MODIFIER AVEC TON VRAI CHEMIN
+FICHIER_DONNEES="$(dirname "$0")/taches.txt"
 DATE_AUJOURDHUI=$(date "+%Y-%m-%d")
 
 # Vérifie si le fichier existe
