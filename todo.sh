@@ -2,7 +2,6 @@
 
 # ==============================================================================
 # PROJET : TO DO LIST - AIAC
-# Description : Gestionnaire de tâches avec Zenity (Interface Graphique)
 # ==============================================================================
 
 FICHIER_DONNEES="taches.txt"
