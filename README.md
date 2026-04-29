@@ -1,4 +1,4 @@
-# 🚀 Système de Gestion TODO List
+#  Système de Gestion TODO List
 
 ## Architecture
 - **Stockage** : Fichier `tasks.txt` (format CSV: ID|Status|Priority|Task|Date)
