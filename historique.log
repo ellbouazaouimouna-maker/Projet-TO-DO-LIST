@@ -1,0 +1,6 @@
+[2026-04-29 22:07:07] user - AJOUT tâche ID=1 Titre='kooora' Statut='En attente' Priorité='Haute' Échéance='2007-1-26' Parent=''
+[2026-04-29 22:07:42] user - SUPPRESSION tâche ID=1 Titre='kooora'
+[2026-04-29 22:07:47] user - EXPORT CSV → export_taches_20260429_220747.csv
+[2026-04-29 22:08:29] user - AJOUT tâche ID=1 Titre='kooora' Statut='En attente' Priorité='Haute' Échéance='2007-1-26' Parent=''
+[2026-04-29 22:09:00] user - AJOUT tâche ID=2 Titre='koooora1' Statut='En attente' Priorité='Haute' Échéance='2026-4-30' Parent='1'
+[2026-04-29 22:10:27] user - MODIFICATION tâche ID=2 | Titre: 'koooora1'→'koora1' | Statut: 'En attente'→'Terminé' | Priorité: 'Haute'→'Basse' | Échéance: '2026-4-30'→'2026-4-30'
