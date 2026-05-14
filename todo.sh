@@ -38,51 +38,6 @@ tache_existe() {
     grep -q "^$1|" "$FICHIER_DONNEES"
 }
 
-# ==============================================================================
-# 1. AJOUTER UNE TÂCHE
-# ==============================================================================
-ajouter_tache() {
-    local inputs
-    inputs=$(zenity_safe --forms --title="➕ Ajouter une tâche" \
-        --text="Remplissez les informations ci-dessous" \
-        --add-entry="Titre" \
-        --add-entry="Description" \
-        --add-combo="Statut" --combo-values="En attente|En cours|Terminé" \
-        --add-combo="Priorité" --combo-values="Haute|Moyenne|Basse" \
-        --add-entry="Échéance (YYYY-MM-DD)" \
-        --add-entry="ID Parent (vide = tâche principale)")
-
-    [ -z "$inputs" ] && return
-
-    local id
-    id=$(generer_id)
-
-    # Parsing des champs retournés par --forms (séparateur |)
-    local titre desc statut priorite echeance parent
-    IFS='|' read -r titre desc statut priorite echeance parent <<< "$inputs"
-
-    # Validation date
-    if [ -n "$echeance" ] && ! date -d "$echeance" &>/dev/null; then
-        zenity_safe --error --text="Format de date invalide. Utilisez YYYY-MM-DD."
-        return
-    fi
-
-    # Validation ID parent
-    if [ -n "$parent" ] && ! tache_existe "$parent"; then
-        zenity_safe --error --text="ID Parent '$parent' introuvable."
-        return
-    fi
-
-    echo "$id|$titre|$desc|$statut|$priorite|$echeance|$parent" >> "$FICHIER_DONNEES"
-
-    # Créer le fichier de sous-tâche si c'est une sous-tâche
-    if [ -n "$parent" ]; then
-        echo "$id" >> "$DOSSIER_SOUS_TACHES/parent_$parent.txt"
-    fi
-
-    log_action "AJOUT tâche ID=$id Titre='$titre' Statut='$statut' Priorité='$priorite' Échéance='$echeance' Parent='$parent'"
-    zenity_safe --info --text=" Tâche '$titre' ajoutée avec succès (ID: $id) !"
-}
 
 # ==============================================================================
 # 2. AFFICHER LES TÂCHES
