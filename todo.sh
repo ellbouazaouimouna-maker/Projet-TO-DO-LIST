@@ -237,7 +237,7 @@ supprimer_tache() {
 # ==============================================================================
 afficher_sous_taches() {
     local id
-    id=$(zenity_safe --entry --title="🔗 Sous-tâches" --text="Entrez l'ID de la tâche parente :")
+    id=$(zenity_safe --entry --title=" Sous-tâches" --text="Entrez l'ID de la tâche parente :")
     [ -z "$id" ] && return
 
     if ! tache_existe "$id"; then
@@ -258,7 +258,7 @@ afficher_sous_taches() {
         return
     fi
 
-    zenity_safe --list --title="🔗 Sous-tâches de '$titre_parent' (ID: $id)" --width=800 --height=400 \
+    zenity_safe --list --title=" Sous-tâches de '$titre_parent' (ID: $id)" --width=800 --height=400 \
         --column="ID" --column="Titre" --column="Statut" --column="Priorité" --column="Échéance" \
         "${args[@]}"
 }
@@ -314,7 +314,7 @@ afficher_historique() {
 
     local contenu
     contenu=$(tail -50 "$FICHIER_HISTORIQUE")
-    zenity_safe --text-info --title="📜 Historique des modifications (50 dernières)" \
+    zenity_safe --text-info --title=" Historique des modifications (50 dernières)" \
         --width=900 --height=500 <<< "$contenu"
 }
 
@@ -322,7 +322,7 @@ afficher_historique() {
 # 9. AIDE
 # ==============================================================================
 afficher_aide() {
-    zenity_safe --text-info --title="❓ Aide - TO DO LIST" --width=700 --height=500 <<'EOF'
+    zenity_safe --text-info --title=" Aide - TO DO LIST" --width=700 --height=500 <<'EOF'
 === SYSTÈME DE GESTION TO DO LIST - AIAC ===
 
 FONCTIONNALITÉS DISPONIBLES :
@@ -394,6 +394,6 @@ while true; do
         "  Importer depuis CSV")   importer_csv ;;
         "  Historique")            afficher_historique ;;
         "  Aide")                  afficher_aide ;;
-        "🚪  Quitter"|"")            exit 0 ;;
+        "  Quitter"|"")            exit 0 ;;
     esac
 done
