@@ -83,6 +83,53 @@ ajouter_tache() {
     log_action "AJOUT tâche ID=$id Titre='$titre' Statut='$statut' Priorité='$priorite' Échéance='$echeance' Parent='$parent'"
     zenity_safe --info --text=" Tâche '$titre' ajoutée avec succès (ID: $id) !"
 }
+# ==============================================================================
+# 2. AFFICHER LES TÂCHES
+# ==============================================================================
+afficher_taches() {
+    local filtre
+    filtre=$(zenity_safe --list --title=" Filtrer les tâches" \
+        --text="Choisissez un filtre d'affichage :" \
+        --column="Filtre" \
+        "Toutes les tâches" \
+        "En attente" \
+        "En cours" \
+        "Terminé" \
+        "Haute priorité" \
+        "Moyenne priorité" \
+        "Basse priorité")
+
+    [ -z "$filtre" ] && return
+
+    local donnees
+    case "$filtre" in
+        "Toutes les tâches")
+            donnees=$(tail -n +2 "$FICHIER_DONNEES") ;;
+        "En attente"|"En cours"|"Terminé")
+            donnees=$(tail -n +2 "$FICHIER_DONNEES" | awk -F'|' -v f="$filtre" '$4 == f') ;;
+        "Haute priorité")
+            donnees=$(tail -n +2 "$FICHIER_DONNEES" | awk -F'|' '$5 == "Haute"') ;;
+        "Moyenne priorité")
+            donnees=$(tail -n +2 "$FICHIER_DONNEES" | awk -F'|' '$5 == "Moyenne"') ;;
+        "Basse priorité")
+            donnees=$(tail -n +2 "$FICHIER_DONNEES" | awk -F'|' '$5 == "Basse"') ;;
+    esac
+
+    if [ -z "$donnees" ]; then
+        zenity_safe --info --text="Aucune tâche trouvée pour ce filtre."
+        return
+    fi
+
+    local args=()
+    while IFS='|' read -r id titre desc statut priorite echeance parent; do
+        args+=("$id" "$titre" "$statut" "$priorite" "$echeance" "$parent")
+    done <<< "$donnees"
+
+    zenity_safe --list --title=" Liste des Tâches — $filtre" --width=900 --height=500 \
+        --column="ID" --column="Titre" --column="Statut" --column="Priorité" --column="Échéance" --column="ID Parent" \
+        "${args[@]}"
+}
+
 
 # ==============================================================================
 # 3. MODIFIER UNE TÂCHE
