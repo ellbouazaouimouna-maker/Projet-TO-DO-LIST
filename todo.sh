@@ -49,7 +49,6 @@ ajouter_tache() {
         --add-entry="Description" \
         --add-combo="Statut" --combo-values="En attente|En cours|Terminé" \
         --add-combo="Priorité" --combo-values="Haute|Moyenne|Basse" \
-        --add-entry="Échéance (YYYY-MM-DD)" \
         --add-entry="ID Parent (vide = tâche principale)")
 
     [ -z "$inputs" ] && return
@@ -58,13 +57,27 @@ ajouter_tache() {
     id=$(generer_id)
 
     # Parsing des champs retournés par --forms (séparateur |)
-    local titre desc statut priorite echeance parent
-    IFS='|' read -r titre desc statut priorite echeance parent <<< "$inputs"
+    local titre desc statut priorite parent
+    IFS='|' read -r titre desc statut priorite parent <<< "$inputs"
 
-    # Validation date
-    if [ -n "$echeance" ] && ! date -d "$echeance" &>/dev/null; then
-        zenity_safe --error --text="Format de date invalide. Utilisez YYYY-MM-DD."
-        return
+    # --- Sélection graphique de la date via calendrier ---
+    local echeance=""
+    local date_choisie
+    date_choisie=$(zenity_safe --calendar \
+        --title="📅 Choisir une échéance" \
+        --text="Sélectionnez une date d'échéance (doit être après aujourd'hui)" \
+        --date-format="%Y-%m-%d")
+
+    if [ -n "$date_choisie" ]; then
+        # Validation : la date doit être strictement postérieure à aujourd'hui
+        local aujourd_hui
+        aujourd_hui=$(date '+%Y-%m-%d')
+        if [[ "$date_choisie" > "$aujourd_hui" ]]; then
+            echeance="$date_choisie"
+        else
+            zenity_safe --error --text="❌ La date '$date_choisie' est invalide.\nL'échéance doit être strictement après aujourd'hui ($aujourd_hui)."
+            return
+        fi
     fi
 
     # Validation ID parent
