@@ -150,13 +150,26 @@ modifier_tache() {
     local ancien_titre ancien_desc ancien_statut ancien_priorite ancien_echeance ancien_parent
     IFS='|' read -r _ ancien_titre ancien_desc ancien_statut ancien_priorite ancien_echeance ancien_parent <<< "$ligne"
 
+    # Mettre l'ancienne valeur en premier dans le combo (devient valeur par défaut)
+    local statuts priorites
+    case "$ancien_statut" in
+        "En cours") statuts="En cours|En attente|Terminé" ;;
+        "Terminé")  statuts="Terminé|En attente|En cours" ;;
+        *)          statuts="En attente|En cours|Terminé" ;;
+    esac
+    case "$ancien_priorite" in
+        "Moyenne")  priorites="Moyenne|Haute|Basse" ;;
+        "Basse")    priorites="Basse|Haute|Moyenne" ;;
+        *)          priorites="Haute|Moyenne|Basse" ;;
+    esac
+
     local inputs
     inputs=$(zenity_safe --forms --title="✏️ Modifier tâche ID $id" \
-        --text="Modifiez les champs souhaités (actuels affichés)" \
+        --text="Modifiez les champs (laisser vide = garder valeur actuelle)" \
         --add-entry="Titre (actuel: $ancien_titre)" \
         --add-entry="Description (actuel: $ancien_desc)" \
-        --add-combo="Statut" --combo-values="En attente|En cours|Terminé" \
-        --add-combo="Priorité" --combo-values="Haute|Moyenne|Basse" \
+        --add-combo="Statut" --combo-values="$statuts" \
+        --add-combo="Priorité" --combo-values="$priorites" \
         --add-entry="Échéance YYYY-MM-DD (actuel: $ancien_echeance)")
 
     [ -z "$inputs" ] && return
@@ -164,12 +177,10 @@ modifier_tache() {
     local nouveau_titre nouveau_desc nouveau_statut nouveau_priorite nouveau_echeance
     IFS='|' read -r nouveau_titre nouveau_desc nouveau_statut nouveau_priorite nouveau_echeance <<< "$inputs"
 
-    # Garder ancienne valeur si champ vide
-    [ -z "$nouveau_titre" ]     && nouveau_titre="$ancien_titre"
-    [ -z "$nouveau_desc" ]      && nouveau_desc="$ancien_desc"
-    [ -z "$nouveau_statut" ]    && nouveau_statut="$ancien_statut"
-    [ -z "$nouveau_priorite" ]  && nouveau_priorite="$ancien_priorite"
-    [ -z "$nouveau_echeance" ]  && nouveau_echeance="$ancien_echeance"
+    # Garder ancienne valeur si champ vide (entrées libres uniquement)
+    [ -z "$nouveau_titre" ]    && nouveau_titre="$ancien_titre"
+    [ -z "$nouveau_desc" ]     && nouveau_desc="$ancien_desc"
+    [ -z "$nouveau_echeance" ] && nouveau_echeance="$ancien_echeance"
 
     # Validation date
     if [ -n "$nouveau_echeance" ] && ! date -d "$nouveau_echeance" &>/dev/null; then
@@ -177,12 +188,9 @@ modifier_tache() {
         return
     fi
 
-    # Remplacement dans le fichier
+    # Remplacement robuste sans sed (grep -v + réinsertion)
     local nouvelle_ligne="$id|$nouveau_titre|$nouveau_desc|$nouveau_statut|$nouveau_priorite|$nouveau_echeance|$ancien_parent"
-    sed -i "s|^$id|.*|$nouvelle_ligne|" "$FICHIER_DONNEES"
-    # Utiliser une approche plus robuste
     grep -v "^$id|" "$FICHIER_DONNEES" > /tmp/todo_tmp.txt
-    # Insérer la nouvelle ligne après l'en-tête en respectant l'ordre des ID
     head -1 /tmp/todo_tmp.txt > /tmp/todo_sorted.txt
     { echo "$nouvelle_ligne"; tail -n +2 /tmp/todo_tmp.txt; } | sort -t'|' -k1 -n >> /tmp/todo_sorted.txt
     mv /tmp/todo_sorted.txt "$FICHIER_DONNEES"
@@ -278,14 +286,18 @@ importer_csv() {
         return
     fi
 
+    local tmp_import="/tmp/todo_import_$$.txt"
+    tail -n +2 "$fichier" > "$tmp_import"
     local compteur=0
-    # Ignorer la première ligne (en-tête)
-    tail -n +2 "$fichier" | while IFS='|' read -r _ titre desc statut priorite echeance parent; do
+
+    while IFS='|' read -r _ titre desc statut priorite echeance parent; do
+        [ -z "$titre" ] && continue
         local id
         id=$(generer_id)
         echo "$id|$titre|$desc|$statut|$priorite|$echeance|$parent" >> "$FICHIER_DONNEES"
         compteur=$((compteur + 1))
-    done
+    done < "$tmp_import"
+    rm -f "$tmp_import"
 
     log_action "IMPORT CSV depuis '$fichier'"
     zenity_safe --info --text="✅ Importation terminée depuis '$fichier'."
