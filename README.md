@@ -36,9 +36,9 @@ Le projet est entièrement développé en **Bash** sans aucun langage externe (P
 
 ### Interface graphique Zenity
 **Zenity** est une bibliothèque GTK permettant de créer des boîtes de dialogue graphiques depuis un script shell. Elle est choisie car :
-- Nativement disponible sur Ubuntu/GNOME
-- Supporte les formulaires, listes, sélecteurs de fichiers, calendriers
-- Légère et simple à intégrer dans Bash
+- Nativement disponible sur Ubuntu/GNOME.
+- Supporte les formulaires, listes, sélecteurs de fichiers, calendriers.
+- Légère et simple à intégrer dans Bash.
 
 ### Format de stockage pipe-separated (`|`)
 Le fichier `taches.txt` utilise `|` comme séparateur au lieu de la virgule (CSV standard) pour éviter les conflits avec les virgules présentes dans les titres et descriptions. Le parsing se fait nativement avec `IFS='|' read` ou `awk -F'|'`.
