@@ -81,7 +81,7 @@ ajouter_tache() {
     fi
 
     log_action "AJOUT tâche ID=$id Titre='$titre' Statut='$statut' Priorité='$priorite' Échéance='$echeance' Parent='$parent'"
-    zenity_safe --info --text="✅ Tâche '$titre' ajoutée avec succès (ID: $id) !"
+    zenity_safe --info --text=" Tâche '$titre' ajoutée avec succès (ID: $id) !"
 }
 
 # ==============================================================================
@@ -89,7 +89,7 @@ ajouter_tache() {
 # ==============================================================================
 afficher_taches() {
     local filtre
-    filtre=$(zenity_safe --list --title="🔍 Filtrer les tâches" \
+    filtre=$(zenity_safe --list --title=" Filtrer les tâches" \
         --text="Choisissez un filtre d'affichage :" \
         --column="Filtre" \
         "Toutes les tâches" \
@@ -126,7 +126,7 @@ afficher_taches() {
         args+=("$id" "$titre" "$statut" "$priorite" "$echeance" "$parent")
     done <<< "$donnees"
 
-    zenity_safe --list --title="📋 Liste des Tâches — $filtre" --width=900 --height=500 \
+    zenity_safe --list --title=" Liste des Tâches — $filtre" --width=900 --height=500 \
         --column="ID" --column="Titre" --column="Statut" --column="Priorité" --column="Échéance" --column="ID Parent" \
         "${args[@]}"
 }
@@ -164,7 +164,7 @@ modifier_tache() {
     esac
 
     local inputs
-    inputs=$(zenity_safe --forms --title="✏️ Modifier tâche ID $id" \
+    inputs=$(zenity_safe --forms --title=" Modifier tâche ID $id" \
         --text="Modifiez les champs (laisser vide = garder valeur actuelle)" \
         --add-entry="Titre (actuel: $ancien_titre)" \
         --add-entry="Description (actuel: $ancien_desc)" \
@@ -197,7 +197,7 @@ modifier_tache() {
     rm -f /tmp/todo_tmp.txt
 
     log_action "MODIFICATION tâche ID=$id | Titre: '$ancien_titre'→'$nouveau_titre' | Statut: '$ancien_statut'→'$nouveau_statut' | Priorité: '$ancien_priorite'→'$nouveau_priorite' | Échéance: '$ancien_echeance'→'$nouveau_echeance'"
-    zenity_safe --info --text="✅ Tâche $id modifiée avec succès !"
+    zenity_safe --info --text=" Tâche $id modifiée avec succès !"
 }
 
 # ==============================================================================
@@ -205,7 +205,7 @@ modifier_tache() {
 # ==============================================================================
 supprimer_tache() {
     local id
-    id=$(zenity_safe --entry --title="🗑️ Supprimer" --text="Entrez l'ID de la tâche à supprimer :")
+    id=$(zenity_safe --entry --title=" Supprimer" --text="Entrez l'ID de la tâche à supprimer :")
     [ -z "$id" ] && return
 
     if ! tache_existe "$id"; then
@@ -229,7 +229,7 @@ supprimer_tache() {
 
     grep -v "^$id|" "$FICHIER_DONNEES" > /tmp/todo_tmp.txt && mv /tmp/todo_tmp.txt "$FICHIER_DONNEES"
     log_action "SUPPRESSION tâche ID=$id Titre='$titre'"
-    zenity_safe --info --text="🗑️ Tâche '$titre' (ID: $id) supprimée."
+    zenity_safe --info --text=" Tâche '$titre' (ID: $id) supprimée."
 }
 
 # ==============================================================================
@@ -270,7 +270,7 @@ exporter_csv() {
     local fichier_export="export_taches_$(date '+%Y%m%d_%H%M%S').csv"
     cp "$FICHIER_DONNEES" "$fichier_export"
     log_action "EXPORT CSV → $fichier_export"
-    zenity_safe --info --text="✅ Exporté sous '$fichier_export'"
+    zenity_safe --info --text=" Exporté sous '$fichier_export'"
 }
 
 # ==============================================================================
@@ -278,7 +278,7 @@ exporter_csv() {
 # ==============================================================================
 importer_csv() {
     local fichier
-    fichier=$(zenity_safe --file-selection --title="📂 Importer un fichier CSV" --file-filter="*.csv *.txt")
+    fichier=$(zenity_safe --file-selection --title=" Importer un fichier CSV" --file-filter="*.csv *.txt")
     [ -z "$fichier" ] && return
 
     if [ ! -f "$fichier" ]; then
@@ -300,7 +300,7 @@ importer_csv() {
     rm -f "$tmp_import"
 
     log_action "IMPORT CSV depuis '$fichier'"
-    zenity_safe --info --text="✅ Importation terminée depuis '$fichier'."
+    zenity_safe --info --text=" Importation terminée depuis '$fichier'."
 }
 
 # ==============================================================================
@@ -370,30 +370,30 @@ EOF
 # MENU PRINCIPAL
 # ==============================================================================
 while true; do
-    choix=$(zenity_safe --list --title="📝 TO DO LIST — MENU PRINCIPAL" \
+    choix=$(zenity_safe --list --title=" TO DO LIST — MENU PRINCIPAL" \
         --width=450 --height=450 \
         --column="Actions" \
-        "📋  Afficher les tâches" \
-        "➕  Ajouter une tâche" \
-        "✏️   Modifier une tâche" \
-        "🗑️   Supprimer une tâche" \
-        "🔗  Voir les sous-tâches" \
-        "💾  Exporter en CSV" \
-        "📂  Importer depuis CSV" \
-        "📜  Historique" \
-        "❓  Aide" \
-        "🚪  Quitter")
+        "  Afficher les tâches" \
+        "  Ajouter une tâche" \
+        "   Modifier une tâche" \
+        "   Supprimer une tâche" \
+        "  Voir les sous-tâches" \
+        "  Exporter en CSV" \
+        "  Importer depuis CSV" \
+        "  Historique" \
+        "  Aide" \
+        "  Quitter")
 
     case "$choix" in
-        "📋  Afficher les tâches")   afficher_taches ;;
-        "➕  Ajouter une tâche")     ajouter_tache ;;
-        "✏️   Modifier une tâche")    modifier_tache ;;
-        "🗑️   Supprimer une tâche")   supprimer_tache ;;
-        "🔗  Voir les sous-tâches")  afficher_sous_taches ;;
-        "💾  Exporter en CSV")       exporter_csv ;;
-        "📂  Importer depuis CSV")   importer_csv ;;
-        "📜  Historique")            afficher_historique ;;
-        "❓  Aide")                  afficher_aide ;;
+        "  Afficher les tâches")   afficher_taches ;;
+        "  Ajouter une tâche")     ajouter_tache ;;
+        "   Modifier une tâche")    modifier_tache ;;
+        "   Supprimer une tâche")   supprimer_tache ;;
+        "  Voir les sous-tâches")  afficher_sous_taches ;;
+        "  Exporter en CSV")       exporter_csv ;;
+        "  Importer depuis CSV")   importer_csv ;;
+        "  Historique")            afficher_historique ;;
+        "  Aide")                  afficher_aide ;;
         "🚪  Quitter"|"")            exit 0 ;;
     esac
 done
