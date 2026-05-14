@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==============================================================================
-# PROJET : TO DO LIST - AIAC
+# PROJET : TO DO LIST 
 # Script  : rappels.sh — Notifications automatiques via cron
 # Usage   : Planifié par cron, exécuté quotidiennement à 09h00
 #           Commande cron : 0 9 * * * /bin/bash /chemin/vers/rappels.sh
@@ -34,7 +34,7 @@ tail -n +2 "$FICHIER_DONNEES" | while IFS='|' read -r id titre desc statut prior
 
     # Rappel : tâche échéant AUJOURD'HUI
     if [ "$echeance" = "$DATE_AUJOURDHUI" ]; then
-        notify-send "⚠️ RAPPEL TO DO LIST" \
+        notify-send " RAPPEL TO DO LIST" \
             "La tâche '$titre' (Priorité : $priorite) arrive à échéance AUJOURD'HUI !" \
             -u critical -i appointment-soon
     fi
