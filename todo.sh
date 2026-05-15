@@ -286,35 +286,7 @@ exporter_csv() {
     zenity_safe --info --text=" Exporté sous '$fichier_export'"
 }
 
-# ==============================================================================
-# 7. IMPORTER DEPUIS CSV
-# ==============================================================================
-importer_csv() {
-    local fichier
-    fichier=$(zenity_safe --file-selection --title=" Importer un fichier CSV" --file-filter="*.csv *.txt")
-    [ -z "$fichier" ] && return
 
-    if [ ! -f "$fichier" ]; then
-        zenity_safe --error --text="Fichier introuvable."
-        return
-    fi
-
-    local tmp_import="/tmp/todo_import_$$.txt"
-    tail -n +2 "$fichier" > "$tmp_import"
-    local compteur=0
-
-    while IFS='|' read -r _ titre desc statut priorite echeance parent; do
-        [ -z "$titre" ] && continue
-        local id
-        id=$(generer_id)
-        echo "$id|$titre|$desc|$statut|$priorite|$echeance|$parent" >> "$FICHIER_DONNEES"
-        compteur=$((compteur + 1))
-    done < "$tmp_import"
-    rm -f "$tmp_import"
-
-    log_action "IMPORT CSV depuis '$fichier'"
-    zenity_safe --info --text=" Importation terminée depuis '$fichier'."
-}
 
 # ==============================================================================
 # 8. AFFICHER L'HISTORIQUE
