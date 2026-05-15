@@ -211,8 +211,6 @@ modifier_tache() {
     log_action "MODIFICATION tâche ID=$id | Titre: '$ancien_titre'→'$nouveau_titre' | Statut: '$ancien_statut'→'$nouveau_statut' | Priorité: '$ancien_priorite'→'$nouveau_priorite' | Échéance: '$ancien_echeance'→'$nouveau_echeance'"
     zenity_safe --info --text=" Tâche $id modifiée avec succès !"
 }
-
-
 # ==============================================================================
 # 4. SUPPRIMER UNE TÂCHE
 # ==============================================================================
