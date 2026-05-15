@@ -75,7 +75,7 @@ ajouter_tache() {
         if [[ "$date_choisie" > "$aujourd_hui" ]]; then
             echeance="$date_choisie"
         else
-            zenity_safe --error --text="❌ La date '$date_choisie' est invalide.\nL'échéance doit être strictement après aujourd'hui ($aujourd_hui)."
+            zenity_safe --error --text=" La date '$date_choisie' est invalide.\nL'échéance doit être strictement après aujourd'hui ($aujourd_hui)."
             return
         fi
     fi
@@ -148,7 +148,7 @@ afficher_taches() {
 # ==============================================================================
 modifier_tache() {
     local id
-    id=$(zenity_safe --entry --title="✏️ Modifier une tâche" --text="Entrez l'ID de la tâche à modifier :")
+    id=$(zenity_safe --entry --title=" Modifier une tâche" --text="Entrez l'ID de la tâche à modifier :")
     [ -z "$id" ] && return
 
     if ! tache_existe "$id"; then
