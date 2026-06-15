@@ -1,76 +1,70 @@
 # ==============================================================================
-# Makefile — Système de Gestion TO DO List
-# Projet : Mini Projet Shell | AIAC — Génie Informatique
+# PROJET : TO DO LIST - AIAC
+# Makefile — Installation, lancement, cron, nettoyage
 # ==============================================================================
 
-SCRIPT_PRINCIPAL = todo.sh
-SCRIPT_RAPPEL    = rappels.sh
-CRON_JOB         = "0 9 * * * /bin/bash $(PWD)/$(SCRIPT_RAPPEL)"
+SCRIPT_DIR  := $(shell pwd)
+TODO        := $(SCRIPT_DIR)/todo.sh
+RAPPELS     := $(SCRIPT_DIR)/rappels.sh
+LOG         := $(SCRIPT_DIR)/cron.log
 
-.PHONY: all install run cron uninstall clean help
+.PHONY: all install run cron uncron clean uninstall help
 
-# Cible par défaut
-all: install
+all: help
 
-# --- INSTALLATION ---
-install:
-	@echo "==> Installation des dépendances..."
-	sudo apt-get update -qq && sudo apt-get install -y zenity libnotify-bin
-	@echo "==> Attribution des droits d'exécution..."
-	chmod +x $(SCRIPT_PRINCIPAL)
-	chmod +x $(SCRIPT_RAPPEL)
-	@echo "==> Initialisation des dossiers..."
-	mkdir -p sub-tasks
-	touch historique.log
-	@if [ ! -f taches.txt ]; then \
-		echo "ID|Titre|Description|Statut|Priorité|Echéance|ID_Parent" > taches.txt; \
-	fi
-	@echo ""
-	@echo "✅ Installation terminée."
-	@echo "   Lancez l'application avec : make run"
-	@echo "   Activez les rappels avec  : make cron"
-
-# --- LANCEMENT ---
-run:
-	@echo "==> Lancement de TO DO LIST..."
-	./$(SCRIPT_PRINCIPAL)
-
-# --- RAPPELS CRON ---
-cron:
-	@echo "==> Ajout du rappel quotidien dans crontab (09h00)..."
-	(crontab -l 2>/dev/null | grep -v "$(SCRIPT_RAPPEL)"; echo $(CRON_JOB)) | crontab -
-	@echo "✅ Cron job installé : exécution tous les jours à 09h00."
-	@echo "   Vérifiez avec : crontab -l"
-
-# --- SUPPRESSION DU CRON ---
-uncron:
-	@echo "==> Suppression du rappel cron..."
-	crontab -l 2>/dev/null | grep -v "$(SCRIPT_RAPPEL)" | crontab -
-	@echo "✅ Cron job supprimé."
-
-# --- DÉSINSTALLATION ---
-uninstall: uncron clean
-	@echo "==> Désinstallation complète effectuée."
-
-# --- NETTOYAGE DES DONNÉES ---
-clean:
-	@echo "==> Nettoyage des données..."
-	rm -f taches.txt historique.log export_taches_*.csv /tmp/todo_tmp.txt /tmp/todo_sorted.txt
-	rm -rf sub-tasks/
-	@echo "✅ Données supprimées."
-
-# --- AIDE ---
+# ── Aide ──────────────────────────────────────────────────────────────────────
 help:
 	@echo ""
-	@echo "========================================="
-	@echo "  TO DO LIST — Makefile Help"
-	@echo "========================================="
+	@echo "  TO DO LIST — Commandes disponibles"
+	@echo "  ─────────────────────────────────────────────"
+	@echo "  make install   →  installe zenity, libnotify"
+	@echo "  make run       →  lance l'application"
+	@echo "  make cron      →  active les rappels (toutes les minutes)"
+	@echo "  make uncron    →  désactive les rappels cron"
+	@echo "  make clean     →  supprime les données (taches, log, config)"
+	@echo "  make uninstall →  clean + désactive le cron"
 	@echo ""
-	@echo "  make install    Installe les dépendances et initialise le projet"
-	@echo "  make run        Lance l'application"
-	@echo "  make cron       Active les rappels quotidiens à 09h00"
-	@echo "  make uncron     Désactive les rappels cron"
-	@echo "  make clean      Supprime les données (taches.txt, historique.log)"
-	@echo "  make uninstall  Nettoyage complet + suppression cron"
-	@echo "  make help       Affiche cette aide"
-	@echo ""
+
+# ── Installation des dépendances ──────────────────────────────────────────────
+install:
+	@echo "==> Installation des dépendances..."
+	@sudo apt-get update -qq
+	@sudo apt-get install -y zenity libnotify-bin 2>/dev/null || \
+		echo "⚠️  Certains paquets n'ont pas pu être installés (mode offline ?)"
+	@chmod +x "$(TODO)" "$(RAPPELS)"
+	@echo "✅ Installation terminée."
+	@echo "   Lancez l'application avec : make run"
+
+# ── Lancement ─────────────────────────────────────────────────────────────────
+run:
+	@echo "==> Lancement de TO DO LIST..."
+	@bash "$(TODO)"
+
+# ── Activation cron (toutes les minutes) ──────────────────────────────────────
+cron:
+	@echo "==> Activation des rappels automatiques (toutes les minutes)..."
+	@(crontab -l 2>/dev/null | grep -v "rappels.sh"; \
+	  echo "* * * * * /bin/bash $(RAPPELS) >> $(LOG) 2>&1") | crontab -
+	@echo "✅ Cron activé : rappels.sh tourne toutes les minutes."
+	@echo "   Logs visibles dans : $(LOG)"
+	@echo "   Vérifiez avec     : crontab -l"
+
+# ── Désactivation cron ────────────────────────────────────────────────────────
+uncron:
+	@echo "==> Désactivation des rappels automatiques..."
+	@crontab -l 2>/dev/null | grep -v "rappels.sh" | crontab -
+	@echo "✅ Cron désactivé."
+
+# ── Nettoyage des données ─────────────────────────────────────────────────────
+clean:
+	@echo "==> Suppression des données..."
+	@rm -f "$(SCRIPT_DIR)/taches.txt"
+	@rm -f "$(SCRIPT_DIR)/historique.log"
+	@rm -f "$(SCRIPT_DIR)/cron.log"
+	@rm -f "$(SCRIPT_DIR)"/export_taches_*.csv
+	@rm -rf "$(SCRIPT_DIR)/sub-tasks"
+	@echo "✅ Données supprimées."
+
+# ── Désinstallation complète ──────────────────────────────────────────────────
+uninstall: clean uncron
+	@echo "✅ Désinstallation terminée."

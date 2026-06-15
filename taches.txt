@@ -1,3 +1,18 @@
 ID|Titre|Description|Statut|Priorité|Echéance|ID_Parent
-1|kooora|kooora|En attente|Haute|2007-1-26|
-2|koora1|kooora|Terminé|Basse|2026-4-30|1
+1|Réviser les systèmes d'exploitation|Relire les chapitres PCB, scheduling et mémoire virtuelle|En retard|Haute|2026-05-20|
+2|Préparer le TP Oracle|Faire les exercices de l'atelier 5 sur les vues et synonymes|En retard|Moyenne|2026-05-22|
+3|Créer les scripts SQL|Écrire les requêtes DBA demandées par le prof|En retard|Haute|2026-05-22|2
+4|Projet drone - YOLOv8|Intégrer la détection d'objets dans AirSim|En retard|Haute|2026-06-01|
+5|Entraîner le modèle|Préparer le dataset et lancer l'entraînement YOLOv8|En retard|Moyenne|2026-05-28|4
+6|Cours réseau - révision VLAN|Revoir la config SVI et DHCP sur Packet Tracer|Terminé|Basse|2026-05-15|
+7|Rendre le rapport UML|Finaliser les diagrammes de classes et séquence|En retard|Haute|2026-05-25|
+8|Lire chapitre MAVLink|Comprendre le protocole pour la commande autonome|En retard|Moyenne|2026-06-05|4
+9|gogle|google|En retard|Haute|2026-06-14 21:32|
+10|kjfg|jhghfjd|En retard|Moyenne|2026-06-14 21:36|
+11|jfoij|sodih|En retard|Haute|2026-06-15 20:00|
+12|jf|fh|Terminé|Haute|2026-06-15 20:12||
+13|hf`|nkj|En attente|Haute|2026-06-15 23:59||
+14|jgj|gjjg|En attente|Haute|2026-06-15 23:59|1|20:33
+15|`echo 18`|`ls`|Terminé|Haute|2026-06-15 20:59||
+16|jfik|kfjhdsh|En attente|Haute|2026-06-15 23:59||
+17|hjdfiuh|dshf|En attente|Haute|2026-06-15 23:59||2026-06-15 21:22

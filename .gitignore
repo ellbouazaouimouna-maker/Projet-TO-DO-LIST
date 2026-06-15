@@ -1,0 +1,8 @@
+taches.txt
+historique.log
+cron.log
+notifications.cfg
+config.cfg
+export_taches_*.csv
+sub-tasks/
+EMAIL_SETUP_GUIDE.md

@@ -4,3 +4,69 @@
 [2026-04-29 22:08:29] user - AJOUT tâche ID=1 Titre='kooora' Statut='En attente' Priorité='Haute' Échéance='2007-1-26' Parent=''
 [2026-04-29 22:09:00] user - AJOUT tâche ID=2 Titre='koooora1' Statut='En attente' Priorité='Haute' Échéance='2026-4-30' Parent='1'
 [2026-04-29 22:10:27] user - MODIFICATION tâche ID=2 | Titre: 'koooora1'→'koora1' | Statut: 'En attente'→'Terminé' | Priorité: 'Haute'→'Basse' | Échéance: '2026-4-30'→'2026-4-30'
+[2026-05-14 19:31:27] user - AJOUT tâche ID=3 Titre='lire' Statut='En cours' Priorité='Moyenne' Échéance='' Parent=''
+[2026-05-14 19:32:09] user - AJOUT tâche ID=4 Titre='kjgg' Statut='En attente' Priorité='Haute' Échéance='' Parent=''
+[2026-05-14 19:56:57] user - SUPPRESSION tâche ID=2 Titre='koora1'
+[2026-05-14 19:58:01] user - MODIFICATION tâche ID=3 | Titre: 'lire'→'read' | Statut: 'En cours'→'En cours' | Priorité: 'Moyenne'→'Moyenne' | Échéance: ''→'2026'
+[2026-05-14 20:06:45] user - AJOUT tâche ID=5 Titre='ajouter' Statut='En attente' Priorité='Haute' Échéance='2026-05-14' Parent=''
+[2026-05-14 20:13:55] user - IMPORT CSV depuis '/home/user/Downloads/Projet-TO-DO-LIST-main/tasks.txt'
+[2026-05-14 20:16:08] user - EXPORT CSV → export_taches_20260514_201608.csv
+[2026-05-14 20:23:31] user - EXPORT CSV → export_taches_20260514_202331.csv
+[2026-05-14 20:25:28] user - IMPORT CSV depuis '/home/user/my_project/Projet-TO-DO-LIST/export_taches_20260514_202331.csv'
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=1 'Réviser les systèmes d'exploitation' passée en 'En retard' (échéance: 2026-05-20)
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=2 'Préparer le TP Oracle' passée en 'En retard' (échéance: 2026-05-22)
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=3 'Créer les scripts SQL' passée en 'En retard' (échéance: 2026-05-22)
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=4 'Projet drone - YOLOv8' passée en 'En retard' (échéance: 2026-06-01)
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=5 'Entraîner le modèle' passée en 'En retard' (échéance: 2026-05-28)
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=7 'Rendre le rapport UML' passée en 'En retard' (échéance: 2026-05-25)
+[2026-06-14 21:29:39] user - AUTO - Tâche ID=8 'Lire chapitre MAVLink' passée en 'En retard' (échéance: 2026-06-05)
+[2026-06-14 21:31:36] user - AJOUT tâche ID=9 Titre='gogle' Statut='En cours' Priorité='Haute' Échéance='2026-06-14 21:32' Parent=''
+[2026-06-14 21:32:03] user - CONFIG EMAIL modifiée — Email='yahoo@yahoo.com' Actif='true'
+[2026-06-14 21:34:02] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-14 21:34:02] RAPPEL - AUTO-EXPIRATION — ID=9 | 'gogle' → En retard | échéance=2026-06-14 21:32
+[2026-06-14 21:35:23] user - AJOUT tâche ID=10 Titre='kjfg' Statut='En cours' Priorité='Moyenne' Échéance='2026-06-14 21:36' Parent=''
+[2026-06-14 21:36:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-14 21:36:01] RAPPEL - HEURE EXACTE — ID=10 | 'kjfg' | échéance=2026-06-14 21:36
+[2026-06-14 21:37:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-14 21:37:01] RAPPEL - AUTO-EXPIRATION — ID=10 | 'kjfg' → En retard | échéance=2026-06-14 21:36
+[2026-06-15 19:56:53] user - AJOUT tâche ID=11 Titre='jfoij' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 20:00' Parent=''
+[2026-06-15 19:59:04] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 19:59:04] RAPPEL - HEURE EXACTE — ID=11 | 'jfoij' | échéance=2026-06-15 20:00
+[2026-06-15 20:00:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:00:01] RAPPEL - HEURE EXACTE — ID=11 | 'jfoij' | échéance=2026-06-15 20:00
+[2026-06-15 20:01:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:01:01] RAPPEL - AUTO-EXPIRATION — ID=11 | 'jfoij' → En retard | échéance=2026-06-15 20:00
+[2026-06-15 20:11:06] user - AJOUT tâche ID=12 Titre='jf' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 20:12' Parent='' Notifications=''
+[2026-06-15 20:12:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:12:01] RAPPEL - HEURE EXACTE — ID=12 | 'jf' | échéance=2026-06-15 20:12 | notifs=''
+[2026-06-15 20:13:02] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:13:02] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:14:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:14:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:15:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:15:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:16:02] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:16:02] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:17:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:17:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:18:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:18:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:19:02] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:19:02] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:20:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:20:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:21:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:21:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=12 | 'jf' | échéance=2026-06-15 20:12 | En attente de décision utilisateur
+[2026-06-15 20:21:02] user - AUTO-POPUP - Tâche ID=12 'jf' passée en 'Terminé' (échéance: 2026-06-15 20:12)
+[2026-06-15 20:28:21] user - AJOUT tâche ID=13 Titre='hf`' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 23:59' Parent='' Notif_Heures=''
+[2026-06-15 20:33:20] user - AJOUT tâche ID=14 Titre='jgj' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 23:59' Parent='1' Notif_Heures='20:33'
+[2026-06-15 20:55:31] user - AJOUT tâche ID=15 Titre='`echo 18`' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 20:59' Parent='' Notif_Heures=''
+[2026-06-15 20:58:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:58:01] RAPPEL - HEURE EXACTE — ID=15 | '`echo 18`' | échéance=2026-06-15 20:59
+[2026-06-15 20:59:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 20:59:01] RAPPEL - HEURE EXACTE — ID=15 | '`echo 18`' | échéance=2026-06-15 20:59
+[2026-06-15 21:00:01] RAPPEL - ERREUR EMAIL : commande 'mail' introuvable. Installer : sudo apt install mailutils
+[2026-06-15 21:00:01] RAPPEL - AUTO-EXPIRATION POPUP — ID=15 | '`echo 18`' | échéance=2026-06-15 20:59 | En attente de décision utilisateur
+[2026-06-15 21:00:23] user - AUTO-POPUP - Tâche ID=15 '`echo 18`' passée en 'Terminé' (échéance: 2026-06-15 20:59)
+[2026-06-15 21:19:41] user - AJOUT tâche ID=16 Titre='jfik' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 23:59' Parent='' Notif_Dates=''
+[2026-06-15 21:22:57] user - AJOUT tâche ID=17 Titre='hjdfiuh' Statut='En attente' Priorité='Haute' Échéance='2026-06-15 23:59' Parent='' Notif_Dates='2026-06-15 21:22'
