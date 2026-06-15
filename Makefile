@@ -30,9 +30,9 @@ install:
 	@echo "==> Installation des dépendances..."
 	@sudo apt-get update -qq
 	@sudo apt-get install -y zenity libnotify-bin 2>/dev/null || \
-		echo "⚠️  Certains paquets n'ont pas pu être installés (mode offline ?)"
+		echo "  Certains paquets n'ont pas pu être installés (mode offline ?)"
 	@chmod +x "$(TODO)" "$(RAPPELS)"
-	@echo "✅ Installation terminée."
+	@echo " Installation terminée."
 	@echo "   Lancez l'application avec : make run"
 
 # ── Lancement ─────────────────────────────────────────────────────────────────
@@ -45,7 +45,7 @@ cron:
 	@echo "==> Activation des rappels automatiques (toutes les minutes)..."
 	@(crontab -l 2>/dev/null | grep -v "rappels.sh"; \
 	  echo "* * * * * /bin/bash $(RAPPELS) >> $(LOG) 2>&1") | crontab -
-	@echo "✅ Cron activé : rappels.sh tourne toutes les minutes."
+	@echo " Cron activé : rappels.sh tourne toutes les minutes."
 	@echo "   Logs visibles dans : $(LOG)"
 	@echo "   Vérifiez avec     : crontab -l"
 
@@ -53,7 +53,7 @@ cron:
 uncron:
 	@echo "==> Désactivation des rappels automatiques..."
 	@crontab -l 2>/dev/null | grep -v "rappels.sh" | crontab -
-	@echo "✅ Cron désactivé."
+	@echo " Cron désactivé."
 
 # ── Nettoyage des données ─────────────────────────────────────────────────────
 clean:
@@ -63,8 +63,8 @@ clean:
 	@rm -f "$(SCRIPT_DIR)/cron.log"
 	@rm -f "$(SCRIPT_DIR)"/export_taches_*.csv
 	@rm -rf "$(SCRIPT_DIR)/sub-tasks"
-	@echo "✅ Données supprimées."
+	@echo " Données supprimées."
 
 # ── Désinstallation complète ──────────────────────────────────────────────────
 uninstall: clean uncron
-	@echo "✅ Désinstallation terminée."
+	@echo " Désinstallation terminée."
