@@ -103,7 +103,7 @@ tail -n +2 "$FICHIER_DONNEES" | while IFS='|' read -r id titre desc statut prior
     # ==================================================================
     if [ -n "$notif_dates" ] && [ "$notif_dates" != "none" ]; then
         # Parcourir les dates séparées par des virgules
-        local IFS_OLD="$IFS"
+        IFS_OLD="$IFS"
         IFS=','
         for date_notif in $notif_dates; do
             IFS="$IFS_OLD"
@@ -114,22 +114,21 @@ tail -n +2 "$FICHIER_DONNEES" | while IFS='|' read -r id titre desc statut prior
             fi
 
             # Convertir en timestamp
-            local NOTIF_TS
             NOTIF_TS=$(date -d "$date_notif" '+%s' 2>/dev/null)
             [ -z "$NOTIF_TS" ] && continue
 
             # Fenêtre de +/- 1 minute (60 secondes)
-            local DIFF_NOTIF=$(( NOTIF_TS - MAINTENANT_TS ))
+            DIFF_NOTIF=$(( NOTIF_TS - MAINTENANT_TS ))
 
             if [ "$DIFF_NOTIF" -ge -60 ] && [ "$DIFF_NOTIF" -le 60 ]; then
-                envoyer_terminal "⏰ ALARME : '$titre' à $date_notif | Échéance : $echeance"
+                envoyer_terminal "ALARME : '$titre' a $date_notif | Echeance : $echeance"
 
                 envoyer_notification \
-                    "⏰ Rappel TO DO LIST — $date_notif" \
-                    "La tâche '$titre' a une alarme programmée.\n Alarme : $date_notif\n Échéance : $echeance\n Priorité : $priorite" \
+                    "Rappel TO DO LIST — $date_notif" \
+                    "La tache '$titre' a une alarme programmee.\n Alarme : $date_notif\n Echeance : $echeance\n Priorite : $priorite" \
                     "critical" "15000"
 
-                log_rappel "ALARME PERSONNALISÉE — ID=$id | '$titre' | alarme=$date_notif | échéance=$echeance"
+                log_rappel "ALARME PERSONNALISEE — ID=$id | '$titre' | alarme=$date_notif | echeance=$echeance"
             fi
         done
         IFS="$IFS_OLD"
@@ -208,7 +207,7 @@ while IFS='|' read -r id titre desc statut priorite echeance parent notif_dates;
             envoyer_terminal " EXPIRÉE : '$titre' | échéance dépassée ($echeance) → Ouvrez l'app pour mettre à jour"
             log_rappel "AUTO-EXPIRATION POPUP — ID=$id | '$titre' | échéance=$echeance | En attente de décision utilisateur"
         else
-            local nouvelle_ligne="$id|$titre|$desc|En retard|$priorite|$echeance|$parent|$notif_dates"
+            nouvelle_ligne="$id|$titre|$desc|En retard|$priorite|$echeance|$parent|$notif_dates"
             grep -v "^$id|" "$FICHIER_DONNEES" > /tmp/todo_tmp.txt
             head -1 /tmp/todo_tmp.txt > /tmp/todo_sorted.txt
             { echo "$nouvelle_ligne"; tail -n +2 /tmp/todo_tmp.txt; } \
