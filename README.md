@@ -1,6 +1,6 @@
 # Système de Gestion TO DO List
 
-## Mini Projet Shell – AIAC | Génie Informatique (GI1)
+## Mini Projet Shell – AIAC | Génie Informatique (GI22)
 
 ### Présentation
 
