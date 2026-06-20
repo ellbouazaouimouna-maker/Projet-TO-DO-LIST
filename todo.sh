@@ -9,7 +9,7 @@ FICHIER_DONNEES="taches.txt"
 FICHIER_HISTORIQUE="historique.log"
 DOSSIER_SOUS_TACHES="sub-tasks"
 FICHIER_NOTIFICATIONS="notifications.cfg"
-FICHIER_SUPPRIMEES="taches_supprime.txt"   # Corbeille : tâches supprimées récupérables
+FICHIER_SUPPRIMEES="taches_supprime.txt"   
 
 # --- INITIALISATION ---
 if [ ! -f "$FICHIER_DONNEES" ]; then
