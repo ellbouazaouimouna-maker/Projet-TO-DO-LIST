@@ -1,145 +1,282 @@
 # Système de Gestion TO DO List
-**Projet : Mini Projet Shell | AIAC — Génie Informatique (GI1)**
+
+## Mini Projet Shell – AIAC | Génie Informatique (GI1)
+
+### Présentation
+
+TO DO List est une application de gestion de tâches développée entièrement en Bash avec une interface graphique basée sur Zenity. Elle permet aux utilisateurs de créer, organiser par ordre numerique(ID) ou alphabetique (Titre) ou par priorite (Haute,moyenne,basse) leurs taches et suivre leurs tâches quotidiennes grâce à une interface simple, intuitive et portable sur les systèmes Linux.
+
+Le projet a été conçu dans le respect des contraintes du module Shell Programming, sans recours à des langages externes tels que Python ou Java.
 
 ---
 
-## Table des matières
-1. [Architecture du projet](#1-architecture-du-projet)
-2. [Choix d'implémentation](#2-choix-dimplémentation)
-3. [Description des composants](#3-description-des-composants)
-4. [Commandes supportées](#4-commandes-supportées)
-5. [Flux de données](#5-flux-de-données)
-
----
-
-## 1. Architecture du projet
+# Architecture du Projet
 
 ```
 projet-todo/
-├── todo.sh              # Script principal — interface graphique Zenity
-├── rappels.sh           # Script de rappels automatiques via cron
-├── Makefile             # Automatisation : install, run, cron, clean
-├── taches.txt           # Base de données principale (format CSV pipe-separated)
-├── historique.log       # Journal horodaté de toutes les actions
-├── sub-tasks/           # Dossier de liens entre tâches et sous-tâches
-│   └── parent_N.txt     # Liste des IDs de sous-tâches du parent N
-├── README.md            # Architecture et choix techniques (ce fichier)
-└── MANUAL.md            # Manuel utilisateur
+├── todo.sh                
+├── rappels.sh             
+├── Makefile               
+├── taches.txt             
+├── taches_supprime.txt   
+├── historique.log        
+├── notifications.cfg      
+├── sub-tasks/
+│   └── parent_N.txt      
+├── README.md              
+└── MANUAL.md              
 ```
 
 ---
 
-## 2. Choix d'implémentation
+# Choix d'Implémentation
 
-### Shell Bash pur
-Le projet est entièrement développé en **Bash** sans aucun langage externe (Python, Perl, etc.). Ce choix garantit la portabilité sur tout système Linux/Unix disposant de Bash 4+, sans installation de runtime supplémentaire.
+## Bash Pur
 
-### Interface graphique Zenity
-**Zenity** est une bibliothèque GTK permettant de créer des boîtes de dialogue graphiques depuis un script shell. Elle est choisie car :
-- Nativement disponible sur Ubuntu/GNOME.
-- Supporte les formulaires, listes, sélecteurs de fichiers, calendriers.
-- Légère et simple à intégrer dans Bash.
+L'application est entièrement développée en Shell Bash afin de garantir :
 
-### Format de stockage pipe-separated (`|`)
-Le fichier `taches.txt` utilise `|` comme séparateur au lieu de la virgule (CSV standard) pour éviter les conflits avec les virgules présentes dans les titres et descriptions. Le parsing se fait nativement avec `IFS='|' read` ou `awk -F'|'`.
+* Une grande portabilité.
+* Une faible consommation de ressources.
+* Aucune dépendance à un langage externe.
 
-### IDs auto-incrémentés
-Les identifiants sont générés automatiquement en lisant le dernier ID du fichier et en ajoutant 1. Cette approche est simple, sans risque de collision dans un usage mono-utilisateur.
+## Interface Graphique Zenity
 
-### Sous-tâches par fichiers de liaison
-Chaque tâche parente dispose d'un fichier `sub-tasks/parent_N.txt` listant les IDs de ses sous-tâches. Cette structure permet une suppression en cascade efficace sans parcourir tout le fichier principal.
+Zenity permet de créer des interfaces graphiques GTK directement depuis Bash.
 
-### Historique textuel horodaté
-Chaque action (ajout, modification, suppression, export, import) est enregistrée dans `historique.log` avec le format :
+Elle est utilisée pour :
+
+* Les formulaires de saisie.
+* Les listes de tâches.
+* Les calendriers.
+* Les boîtes de dialogue.
+* Les messages d'information et d'erreur.
+
+## Stockage des Données
+
+Les tâches sont stockées dans un fichier texte utilisant le séparateur :
+
 ```
-[YYYY-MM-DD HH:MM:SS] utilisateur - ACTION détails
+|
 ```
-Cela permet une traçabilité complète sans base de données.
 
-### Rappels via cron + notify-send
-Les notifications d'échéance sont gérées par `rappels.sh`, planifié via **cron** (exécution quotidienne à 09h00). `notify-send` affiche une notification système native (bulle de notification Ubuntu), compatible avec l'environnement GNOME/X11.
+Exemple :
+
+```
+1|Rapport IA|Finaliser le rapport|En cours|Haute|2026-06-20 18:00||
+```
+
+Ce format facilite la lecture et le traitement avec Bash et AWK.
+
+## Gestion des Identifiants
+
+Chaque tâche reçoit automatiquement un identifiant unique généré à partir du plus grand ID existant.
+
+## Gestion des Sous-Tâches
+
+Les relations entre tâches parentes et sous-tâches sont enregistrées dans des fichiers dédiés :
+
+```
+sub-tasks/parent_3.txt
+```
+
+Cette approche permet une suppression et une restauration efficaces.
 
 ---
 
-## 3. Description des composants
+# Fonctionnalités Principales
 
-### `todo.sh` — Script principal
+## Gestion des tâches
 
-| Fonction | Rôle |
-|---|---|
-| `zenity_safe()` | Encapsule zenity en masquant les erreurs Mesa/EGL |
-| `log_action()` | Écrit une entrée horodatée dans `historique.log` |
-| `generer_id()` | Calcule le prochain ID disponible |
-| `tache_existe()` | Vérifie si un ID existe dans `taches.txt` |
-| `ajouter_tache()` | Formulaire d'ajout avec validation date et ID parent |
-| `afficher_taches()` | Affichage avec filtres statut/priorité |
-| `modifier_tache()` | Édition d'une tâche existante avec traçage des changements |
-| `supprimer_tache()` | Suppression avec cascade sur les sous-tâches |
-| `afficher_sous_taches()` | Affichage hiérarchique des sous-tâches d'un parent |
-| `exporter_csv()` | Copie horodatée de `taches.txt` |
-| `importer_csv()` | Import depuis fichier CSV externe |
-| `afficher_historique()` | Affiche les 50 dernières entrées du journal |
-| `afficher_aide()` | Documentation intégrée complète |
+* Ajout d'une tâche.
+* Modification d'une tâche.
+* Suppression d'une tâche.
+* Restauration d'une tâche supprimée.
+* Affichage des tâches tries par ordre choisi par l'utilisateur.
+* Gestion des sous-tâches.
 
-### `rappels.sh` — Notifications cron
+## Gestion des priorités
 
-Parcourt `taches.txt` ligne par ligne. Pour chaque tâche dont l'échéance correspond à la date du jour et dont le statut n'est pas "Terminé", envoie une notification critique via `notify-send`.
+Chaque tâche peut être définie avec :
 
-### `Makefile` — Automatisation
+* Haute priorité
+* Moyenne priorité
+* Basse priorité
 
-| Cible | Action |
-|---|---|
-| `make install` | Installe zenity + libnotify-bin, initialise les fichiers |
-| `make run` | Lance `todo.sh` |
-| `make cron` | Installe le rappel quotidien dans crontab |
-| `make uncron` | Supprime le rappel cron |
-| `make clean` | Supprime les données (taches.txt, historique.log, exports) |
-| `make uninstall` | Nettoyage complet + suppression cron |
-| `make help` | Affiche l'aide Makefile |
+## Gestion des statuts
+
+Les statuts disponibles sont :
+
+* En attente
+* En cours
+* Terminé
+* En retard
 
 ---
 
-## 4. Commandes supportées
+# Nouvelles Fonctionnalités Ajoutées
 
-Toutes les commandes sont accessibles via le **menu graphique** de `todo.sh` :
+## Corbeille et Restauration
 
-| Action | Description |
-|---|---|
-| Afficher les tâches | Liste avec filtre statut ou priorité |
-| Ajouter une tâche | Formulaire complet avec validation |
-| Modifier une tâche | Édition par ID, conservation des champs non modifiés |
-| Supprimer une tâche | Suppression avec confirmation et cascade sous-tâches |
-| Voir les sous-tâches | Affichage hiérarchique par tâche parente |
-| Exporter en CSV | Export horodaté dans le dossier courant |
-| Importer depuis CSV | Import via explorateur de fichiers |
-| Historique | Journal des 50 dernières actions |
-| Aide | Documentation intégrée |
-| Quitter | Ferme l'application |
+Les tâches supprimées ne sont plus perdues définitivement.
+
+Elles sont déplacées vers :
+
+```
+taches_supprime.txt
+```
+
+L'utilisateur peut :
+
+* Consulter les tâches supprimées.
+* Restaurer une tâche supprimée.
+* Restaurer automatiquement les liens parent/enfant.
+
+Cette fonctionnalité réduit fortement le risque de perte accidentelle de données.
 
 ---
 
-## 5. Flux de données
+## Notifications Personnalisées
+
+Lors de la création ou de la modification d'une tâche, l'utilisateur peut définir :
+
+* Une ou plusieurs dates de rappel.
+* Une heure précise pour chaque rappel.
+
+Exemple :
 
 ```
-Utilisateur
-    │
-    ▼
-[todo.sh] ──────────────────────────────────────────┐
-    │                                               │
-    ├── Lecture/Écriture ──► taches.txt             │
-    │                        (base de données)      │
-    │                                               │
-    ├── Écriture ──────────► historique.log         │
-    │                        (traçabilité)          │
-    │                                               │
-    ├── Lecture/Écriture ──► sub-tasks/parent_N.txt │
-    │                        (liens sous-tâches)    │
-    │                                               │
-    └── Export ────────────► export_taches_*.csv    │
-                                                    │
-[rappels.sh] ◄── cron (09h00) ──────────────────────┘
-    │
-    ├── Lecture ───────────► taches.txt
-    │
-    └── notify-send ───────► Notification système Ubuntu
+2026-06-18 14:30
+2026-06-19 09:00
+2026-06-20 08:00
 ```
+
+Des vérifications garantissent que :
+
+* La date est valide.
+* Elle est dans le futur.
+* Elle est antérieure à l'échéance.
+* Aucun doublon n'existe.
+
+---
+
+## Notifications Globales
+
+Un fichier :
+
+```
+notifications.cfg
+```
+
+permet de configurer les rappels automatiques :
+
+* 1 heure avant l'échéance.
+* 30 minutes avant l'échéance.
+* 10 minutes avant l'échéance.
+* À l'heure exacte.
+* Popup à l'expiration.
+
+L'utilisateur peut activer ou désactiver chaque option via l'interface graphique.
+
+---
+
+## Détection Automatique des Tâches Expirées
+
+À chaque démarrage de l'application :
+
+* Les tâches dont l'échéance est dépassée sont détectées.
+* Un popup demande si la tâche est terminée.
+* Sinon elle est automatiquement marquée "En retard".
+
+Cela permet un suivi plus réaliste de l'avancement du travail.
+
+---
+
+## Historique et Traçabilité
+
+Chaque opération est enregistrée dans :
+
+```
+historique.log
+```
+
+Format :
+
+```
+[2026-06-20 14:30:12] mouna - AJOUT tâche ID=12
+```
+
+Les opérations journalisées :
+
+* Ajout
+* Modification
+* Suppression
+* Restauration
+* Import
+* Export
+* Changement de configuration
+
+---
+
+# Description des Composants
+
+## todo.sh
+
+Script principal contenant :
+
+| Fonction                   | Description                      |
+| -------------------------- | -------------------------------- |
+| zenity_safe()              | Gestion sécurisée de Zenity      |
+| log_action()               | Journalisation                   |
+| generer_id()               | Génération d'identifiants        |
+| ajouter_tache()            | Création de tâches               |
+| modifier_tache()           | Modification                     |
+| supprimer_tache()          | Mise en corbeille                |
+| restaurer_tache()          | Récupération depuis la corbeille |
+| afficher_taches()          | Affichage et filtrage            |
+| afficher_sous_taches()     | Vue hiérarchique                 |
+| configurer_notifications() | Paramétrage des rappels          |
+| afficher_historique()      | Consultation du journal          |
+
+---
+
+## rappels.sh
+
+Responsable des notifications système.
+
+Fonctionnement :
+
+1. Lecture de taches.txt
+2. Vérification des échéances
+3. Déclenchement des notifications
+4. Affichage via notify-send
+
+---
+
+## Makefile
+
+| Commande       | Action                                |
+| -------------- | ------------------------------------- |
+| make install   | Installation et initialisation        |
+| make run       | Lancement de l'application            |
+| make cron      | Installation des rappels automatiques |
+| make uncron    | Suppression du cron                   |
+| make clean     | Nettoyage des données                 |
+| make uninstall | Désinstallation complète              |
+| make help      | Affichage de l'aide                   |
+
+---
+
+# Flux de Données
+
+```
+Utilisateur =>todo.sh =>taches.txt =>hisstorique.log =>taches_supprime.txt 
+    
+```
+
+---
+
+# Conclusion
+
+Ce projet démontre qu'il est possible de réaliser une application complète de gestion de tâches en Shell Bash tout en proposant une interface graphique moderne, une gestion avancée des notifications, une corbeille avec restauration, un historique détaillé et une organisation hiérarchique des tâches.
+
+L'ensemble respecte les contraintes pédagogiques du module tout en apportant des fonctionnalités généralement présentes dans des applications professionnelles de gestion de tâches.
