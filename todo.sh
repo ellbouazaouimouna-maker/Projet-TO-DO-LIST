@@ -2,17 +2,22 @@
 
 # ==============================================================================
 # PROJET : TO DO LIST - AIAC
-# Version : 6.2 - Sans email, police agrandie
+# Version : 7.2 
 # ==============================================================================
 
 FICHIER_DONNEES="taches.txt"
 FICHIER_HISTORIQUE="historique.log"
 DOSSIER_SOUS_TACHES="sub-tasks"
 FICHIER_NOTIFICATIONS="notifications.cfg"
+FICHIER_SUPPRIMEES="taches_supprime.txt"   # Corbeille : tâches supprimées récupérables
 
 # --- INITIALISATION ---
 if [ ! -f "$FICHIER_DONNEES" ]; then
     echo "ID|Titre|Description|Statut|Priorité|Echéance|ID_Parent|Notif_Dates" > "$FICHIER_DONNEES"
+fi
+# Corbeille : même format que taches.txt
+if [ ! -f "$FICHIER_SUPPRIMEES" ]; then
+    echo "ID|Titre|Description|Statut|Priorité|Echéance|ID_Parent|Notif_Dates" > "$FICHIER_SUPPRIMEES"
 fi
 touch "$FICHIER_HISTORIQUE"
 mkdir -p "$DOSSIER_SOUS_TACHES"
@@ -332,6 +337,7 @@ ajouter_tache() {
 # ==============================================================================
 # 2. AFFICHER LES TÂCHES
 # ==============================================================================
+
 afficher_taches() {
     local filtre
     filtre=$(zenity_safe --list --title=" Filtrer les tâches" \
@@ -367,8 +373,25 @@ afficher_taches() {
         return
     fi
 
+    # Tri initial par ID (l'utilisateur pourra re-trier en cliquant les en-têtes)
+    donnees=$(echo "$donnees" | sort -t'|' -k1 -n)
+
+    # Largeur de remplissage de l'ID : Zenity trie les colonnes comme du TEXTE.
+    # En complétant l'ID avec des zéros à gauche (ex: 02, 10), le tri par clic
+    # sur l'en-tête "ID" respecte l'ordre NUMÉRIQUE (2 avant 10 et non l'inverse).
+    # Remarque : si tous les ID ont 1 chiffre, aucun zéro n'est ajouté.
+    local largeur_id
+    largeur_id=$(echo "$donnees" | awk -F'|' 'length($1)>m{m=length($1)} END{print m+0}')
+    [ -z "$largeur_id" ] && largeur_id=1
+    [ "$largeur_id" -lt 1 ] && largeur_id=1
+
+    # Construire les lignes du tableau
     local args=()
     while IFS='|' read -r id titre desc statut priorite echeance parent notif_dates; do
+        [ -z "$id" ] && continue
+        local id_aff
+        id_aff=$(printf "%0${largeur_id}d" "$id" 2>/dev/null) || id_aff="$id"
+
         local notifs_affichage
         if [ -z "$notif_dates" ]; then
             notifs_affichage=" Global"
@@ -377,10 +400,18 @@ afficher_taches() {
         else
             notifs_affichage=" $notif_dates"
         fi
-        args+=("$id" "$titre" "$statut" "$priorite" "$echeance" "$notifs_affichage")
+        args+=("$id_aff" "$titre" "$statut" "$priorite" "$echeance" "$notifs_affichage")
     done <<< "$donnees"
 
-    zenity_safe --list --title=" Liste des Tâches — $filtre" --width=1000 --height=500 \
+    # AFFICHAGE — Dans Zenity, les en-têtes de colonnes sont CLIQUABLES :
+    #   • 1er clic sur un en-tête  → tri croissant sur cette colonne
+    #   • 2e clic sur le même en-tête → tri décroissant
+    # Le tri se fait en temps réel, sans rouvrir la fenêtre, exactement comme
+    # dans l'explorateur de fichiers Windows.
+    zenity_safe --list \
+        --title=" Liste des Tâches — $filtre" \
+        --text="Cliquez sur un en-tête de colonne (ID, Titre, Statut, Priorité, Échéance) pour trier. Re-cliquez pour inverser l'ordre." \
+        --width=1000 --height=520 \
         --column="ID" --column="Titre" --column="Statut" --column="Priorité" --column="Échéance" --column="Notifications" \
         "${args[@]}"
 }
@@ -501,6 +532,19 @@ modifier_tache() {
 # ==============================================================================
 # 4. SUPPRIMER UNE TÂCHE
 # ==============================================================================
+# --- Helper : copie la ligne d'une tâche depuis taches.txt vers la corbeille ---
+deplacer_vers_corbeille() {
+    local id_supp="$1"
+    local ligne_supp
+    ligne_supp=$(grep "^$id_supp|" "$FICHIER_DONNEES")
+    [ -z "$ligne_supp" ] && return
+    # S'assurer que la corbeille a bien un entête
+    if [ ! -f "$FICHIER_SUPPRIMEES" ]; then
+        head -1 "$FICHIER_DONNEES" > "$FICHIER_SUPPRIMEES"
+    fi
+    echo "$ligne_supp" >> "$FICHIER_SUPPRIMEES"
+}
+
 supprimer_tache() {
     local id
     id=$(zenity_safe --entry --title=" Supprimer" --text="Entrez l'ID de la tâche à supprimer :")
@@ -514,19 +558,88 @@ supprimer_tache() {
     local titre
     titre=$(grep "^$id|" "$FICHIER_DONNEES" | cut -d'|' -f2)
 
-    zenity_safe --question --text="Supprimer la tâche '$titre' (ID: $id) et ses sous-tâches ?" || return
+    zenity_safe --question --text="Déplacer la tâche '$titre' (ID: $id) et ses sous-tâches vers la corbeille ?\n\nVous pourrez la restaurer plus tard depuis le menu.\n( Restaurer une tâche)" || return
 
+    # Sous-tâches : on les déplace d'abord vers la corbeille, puis on les retire
     if [ -f "$DOSSIER_SOUS_TACHES/parent_$id.txt" ]; then
         while IFS= read -r sous_id; do
+            deplacer_vers_corbeille "$sous_id"
             grep -v "^$sous_id|" "$FICHIER_DONNEES" > /tmp/todo_tmp.txt && mv /tmp/todo_tmp.txt "$FICHIER_DONNEES"
-            log_action "SUPPRESSION sous-tâche ID=$sous_id (parent=$id)"
+            log_action "CORBEILLE sous-tâche ID=$sous_id (parent=$id)"
         done < "$DOSSIER_SOUS_TACHES/parent_$id.txt"
         rm -f "$DOSSIER_SOUS_TACHES/parent_$id.txt"
     fi
 
+    # Tâche principale : déplacement vers la corbeille puis retrait de la liste active
+    deplacer_vers_corbeille "$id"
     grep -v "^$id|" "$FICHIER_DONNEES" > /tmp/todo_tmp.txt && mv /tmp/todo_tmp.txt "$FICHIER_DONNEES"
-    log_action "SUPPRESSION tâche ID=$id Titre='$titre'"
-    zenity_safe --info --text=" Tâche '$titre' (ID: $id) supprimée."
+    log_action "CORBEILLE tâche ID=$id Titre='$titre'"
+    zenity_safe --info --text=" Tâche '$titre' (ID: $id) déplacée vers la corbeille.\n\nPour la récupérer : menu →  Restaurer une tâche."
+}
+
+# ==============================================================================
+# 4 bis. RESTAURER UNE TÂCHE (depuis la corbeille)
+# ==============================================================================
+restaurer_tache() {
+    # Vérifier que la corbeille contient au moins une tâche
+    if [ ! -f "$FICHIER_SUPPRIMEES" ] || [ -z "$(tail -n +2 "$FICHIER_SUPPRIMEES" 2>/dev/null)" ]; then
+        zenity_safe --info --text="La corbeille est vide. Aucune tâche à restaurer."
+        return
+    fi
+
+    # Construire la liste des tâches supprimées
+    local args=()
+    while IFS='|' read -r rid rtitre rdesc rstatut rpriorite recheance rparent rnotif; do
+        [ -z "$rid" ] && continue
+        args+=("$rid" "$rtitre" "$rstatut" "$rpriorite" "$recheance")
+    done < <(tail -n +2 "$FICHIER_SUPPRIMEES")
+
+    # Laisser l'utilisateur choisir la tâche à restaurer
+    local id
+    id=$(zenity_safe --list \
+        --title=" Corbeille — Restaurer une tâche" \
+        --text="Sélectionnez la tâche à restaurer, puis cliquez sur OK :" \
+        --width=900 --height=450 \
+        --column="ID" --column="Titre" --column="Statut" --column="Priorité" --column="Échéance" \
+        "${args[@]}")
+
+    [ -z "$id" ] && return
+
+    # Récupérer la ligne complète dans la corbeille
+    local ligne
+    ligne=$(grep "^$id|" "$FICHIER_SUPPRIMEES")
+    if [ -z "$ligne" ]; then
+        zenity_safe --error --text="Tâche ID '$id' introuvable dans la corbeille."
+        return
+    fi
+
+    # Empêcher un conflit si un ID identique existe déjà dans la liste active
+    if grep -q "^$id|" "$FICHIER_DONNEES"; then
+        zenity_safe --error --text="Impossible de restaurer : une tâche avec l'ID $id existe déjà dans la liste active."
+        return
+    fi
+
+    # 1) Réinsérer la ligne dans taches.txt, puis re-trier par ID
+    grep -v "^$id|" "$FICHIER_DONNEES" > /tmp/todo_restore.txt
+    head -1 /tmp/todo_restore.txt > /tmp/todo_restore_sorted.txt
+    { echo "$ligne"; tail -n +2 /tmp/todo_restore.txt; } | sort -t'|' -k1 -n >> /tmp/todo_restore_sorted.txt
+    mv /tmp/todo_restore_sorted.txt "$FICHIER_DONNEES"
+    rm -f /tmp/todo_restore.txt
+
+    # 2) Retirer la ligne de la corbeille
+    grep -v "^$id|" "$FICHIER_SUPPRIMEES" > /tmp/corbeille_tmp.txt && mv /tmp/corbeille_tmp.txt "$FICHIER_SUPPRIMEES"
+
+    # 3) Reconstituer le lien parent → sous-tâche si la tâche restaurée a un parent
+    local parent_restaure
+    parent_restaure=$(echo "$ligne" | cut -d'|' -f7)
+    if [ -n "$parent_restaure" ]; then
+        echo "$id" >> "$DOSSIER_SOUS_TACHES/parent_$parent_restaure.txt"
+    fi
+
+    local titre_restaure
+    titre_restaure=$(echo "$ligne" | cut -d'|' -f2)
+    log_action "RESTAURATION tâche ID=$id Titre='$titre_restaure' (depuis la corbeille)"
+    zenity_safe --info --text=" Tâche '$titre_restaure' (ID: $id) restaurée avec succès dans la liste active."
 }
 
 # ==============================================================================
@@ -644,7 +757,7 @@ configurer_notifications() {
     inputs=$(zenity_safe --forms \
         --title=" Configuration des Notifications Globales" \
         --text="Paramètres par défaut pour les tâches SANS dates personnalisées :" \
-        --add-combo="⏰ Rappel 1 heure avant" --combo-values="$val_1h" \
+        --add-combo=" Rappel 1 heure avant" --combo-values="$val_1h" \
         --add-combo=" Rappel 30 minutes avant" --combo-values="$val_30min" \
         --add-combo=" Rappel 10 minutes avant" --combo-values="$val_10min" \
         --add-combo=" Rappel à l'heure exacte" --combo-values="$val_exact" \
@@ -760,6 +873,7 @@ while true; do
         "  Ajouter une tâche" \
         "   Modifier une tâche" \
         "   Supprimer une tâche" \
+        "  Restaurer une tâche" \
         "  Voir les sous-tâches" \
         "  Exporter en CSV" \
         "  Importer depuis CSV" \
@@ -773,6 +887,7 @@ while true; do
         "  Ajouter une tâche")          ajouter_tache ;;
         "   Modifier une tâche")         modifier_tache ;;
         "   Supprimer une tâche")        supprimer_tache ;;
+        "  Restaurer une tâche")        restaurer_tache ;;
         "  Voir les sous-tâches")       afficher_sous_taches ;;
         "  Exporter en CSV")            exporter_csv ;;
         "  Importer depuis CSV")        importer_csv ;;
@@ -782,4 +897,3 @@ while true; do
         "  Quitter"|"")                 exit 0 ;;
     esac
 done
-
