@@ -59,6 +59,7 @@ uncron:
 clean:
 	@echo "==> Suppression des données..."
 	@rm -f "$(SCRIPT_DIR)/taches.txt"
+	@rm -f "$(SCRIPT_DIR)/taches_supprime.txt"
 	@rm -f "$(SCRIPT_DIR)/historique.log"
 	@rm -f "$(SCRIPT_DIR)/cron.log"
 	@rm -f "$(SCRIPT_DIR)"/export_taches_*.csv
